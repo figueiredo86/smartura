@@ -9,5 +9,4 @@ DSTSERVER=nvtpabx
 
 echo $DSTSERVER
 
-rsync -avzh /home/suportenvt/produtos/smartura/asterisk/etc/asterisk/ -e 'ssh -p 22' suportenvt@$DSTSERVER:/home/suportenvt/asterisk
-
+sshpass -p 'suportenvt' rsync -avzh /home/suportenvt/produtos/smartura/asterisk/etc/asterisk/ -e 'ssh -p 22' suportenvt@$DSTSERVER:/home/suportenvt/asterisk

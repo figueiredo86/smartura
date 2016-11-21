@@ -1,0 +1,15 @@
+TARGETS = rsyslog killprocs motd atd mysql acpid dbus cron ssh ntp rsync asterisk exim4 bootlogs single rc.local rmnologin
+INTERACTIVE =
+atd: rsyslog
+mysql: rsyslog
+acpid: rsyslog
+dbus: rsyslog
+cron: rsyslog
+ssh: rsyslog
+ntp: rsyslog
+rsync: rsyslog
+asterisk: rsyslog mysql
+exim4: rsyslog mysql
+single: killprocs bootlogs motd
+rc.local: atd rsyslog asterisk mysql exim4 bootlogs motd acpid dbus cron ssh ntp rsync
+rmnologin: atd rsyslog asterisk mysql exim4 bootlogs motd acpid dbus cron ssh ntp rsync

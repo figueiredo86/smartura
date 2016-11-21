@@ -1,0 +1,7 @@
+context ura_geral {
+	1122334455 => {
+		Set(ARRAY(RAMAL,CNOME,URANOME,ORDEMSAUDACAO,ID_URA)=${ODBC_GETURAINFO(${EXTEN:0:2},${EXTEN:2:8})});
+		Set(CAMINHOAUDIOS=/var/lib/asterisk/sounds/${CNOME}/${URANOME});
+		AELSub(entrada_ura);
+	}
+}

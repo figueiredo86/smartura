@@ -1,0 +1,8 @@
+macro URATESTE (ORDEM) {
+	switch (${ORDEM}) {
+		case 2:
+			Set(_VALORDIGITADO=3);
+			break;
+	}
+return;
+}

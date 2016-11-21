@@ -1,0 +1,3 @@
+#include "/etc/asterisk/clientes/NVT/NVT.ael"
+#include "/etc/asterisk/nvt_macros.ael"
+#include "/etc/asterisk/ura_geral.ael"

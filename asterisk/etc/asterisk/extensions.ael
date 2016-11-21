@@ -6,9 +6,4 @@ context default {
 	}
 }
 
-context receptivo {
-	4000 => {
-		AELSub(ura,${EXTEN});
-	}
-#include /etc/asterisk/macros_ura.ael
-}
+#include "/etc/asterisk/nvt_includes.ael"

@@ -1,0 +1,13 @@
+TARGETS = atd asterisk exim4 urandom mysql sendsigs rsyslog umountnfs.sh rpcbind nfs-common hwclock.sh networking umountfs umountroot halt reboot
+mysql: asterisk exim4
+sendsigs: atd asterisk mysql exim4
+rsyslog: atd asterisk sendsigs mysql exim4
+umountnfs.sh: atd asterisk rsyslog mysql exim4 sendsigs
+rpcbind: umountnfs.sh
+nfs-common: umountnfs.sh
+hwclock.sh: atd rsyslog mysql nfs-common
+networking: umountnfs.sh asterisk mysql exim4 rpcbind
+umountfs: hwclock.sh umountnfs.sh networking atd asterisk mysql exim4 urandom rpcbind
+umountroot: umountfs
+halt: umountroot
+reboot: umountroot

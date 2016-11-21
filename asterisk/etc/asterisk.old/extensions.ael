@@ -1,0 +1,104 @@
+context default {
+	_X. => {
+		Verbose(Tentativa de discagem - ${CALLERID(num)} para ${EXTEN} - contexto DEFAULT);
+		Wait(2);
+		Hangup();
+	}
+}
+context ramal {
+	_X. => {
+		Set(ORIGEM=200); //Origem CALLERID(num)
+		Set(ARRAY(ddd,nome,ramal)=${ODBC_DADOSCLI(${ORIGEM})});
+		AELSub(ajustanumero,${EXTEN});
+		//Set(ARRAY(Pa,Pb,Pc,Pd,Pe,Pf,Pg,Ph,Pi,Pj)=${ODBC_SP_AMD(15)});
+		Set(CALLERID(num)=${telefone});
+		Set(PERFIL=${ODBC_PERFILRAMAL(${tiponumero},${ORIGEM})});
+		if (${PERFIL}=0) {
+			Verbose(Tipo de chamada ${tipochamada}/${tiponumero} nao permitida ao ramal ${ORIGEM});
+			Hangup();
+		}
+		if (!${ISNULL(${nonodigito})}) {
+			Set(ARRAY(csp,operadora,nonodigito)=${ODBC_PORTABILIDADE(${ddd},${telefone:4:4},${telefone:8:4})});
+		} else {
+			Verbose(sem nono digito);
+			Set(ARRAY(csp,operadora,nonodigito)=${ODBC_PORTABILIDADE(${ddd},${telefone:3:4},${telefone:7:4})});
+		}
+		Verbose(--TIPO NUMERO: ${tiponumero} --- TIPO CHAMADA: ${tipochamada}--);
+		Hangup;
+	}
+}
+
+macro ajustanumero(number) {
+	/*
+	tipochamada: I(interno), M(movel), F(fixo)
+	tiponumero: ldn_m (movel ddd), ldn_f (fixo ddd), local_m (movel local), local_f (fixo local), interno
+	nonodigito: 1 (numero com 9 digitos), vazio (8 digitos)
+	*/
+	if (${number:0:1}!=0) {
+		Set(tipochamada=I);
+		Set(tiponumer=interno);
+		AELSub(mapafuncoes);
+	}
+	Set(nonodigito=$[]);
+	//Filtro para bloquear chamadas com CSP. Ex.: 002111988888888 
+	if (${LEN(${number})}>=14) {
+		Verbose(Numero com mais de ${LEN(${number})} digitos. Inserir corretamente para completar a discagem_${number});
+		Hangup();
+	} //Inicio LDN 
+	else { //Celular LDN com 9 digitos. Ex.: 0021988888888
+		if (${LEN(${number})}=13 & ${number:1:1}=0) {
+			Set(tipochamada=M);
+			Set(tiponumero=ldn_m);
+			Set(nonodigito=1);
+		} else { //Filtra para ver se e fixo ou movel. 8 digitos. Ex.: 002188888888
+			if (${LEN(${number})}=12 & ${number:4:1}>6) {
+				Set(tipochamada=M);
+				Set(tiponumero=ldn_m);
+			} else {
+				if (${LEN(${number})}=12 & ${number:4:1}<=6) {
+					Set(tipochamada=F);
+					Set(tiponumero=ldn_f);
+				}
+			}
+		}
+	}
+	//Inicio Local. Ex.: 0988888888
+	if (${LEN(${number})}=10 & ${number:1:1}=9) {
+		Set(telefone=0${ddd}${number:1});
+		Set(tipochamada=M);
+		Set(tiponumero=local_m);
+		Set(nonodigito=1);
+	} else { //8 digitos. Ex.: 088888888
+		if (${LEN(${number})}=9 & ${number:1:1}>6) {
+			Set(telefone=0${ddd}${number:1});
+			Set(tipochamada=M);
+			Set(tiponumero=local_m);
+		} else {
+			if (${LEN(${number})}=9 & ${number:1:1}<=6) {
+				Set(telefone=0${ddd}${number:1});
+				Set(tipochamada=F);
+				Set(tiponumero=local_f);
+			} 
+		}
+	}
+return;
+}
+
+macro mapafuncoes() {
+	Verbose(criar mapa de funcoes);
+	Hangup();
+	return;
+}
+
+
+
+context teste {
+	100 => {
+		Dial(SIP/200,,U(felipe,100));
+	}
+}
+
+macro felipe (valor) {
+	NoOp(RECEBI O VALOR ${valor});
+	return;
+}
